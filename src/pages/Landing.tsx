@@ -38,7 +38,7 @@ export const Landing = () => {
           
           <h2 className="text-5xl font-bold text-white mb-6 leading-tight max-lg:text-4xl max-md:text-3xl max-sm:text-2xl max-sm:mb-4">
             Your Intelligent<br />
-            <span className="text-accent">Knowledge Companion</span>
+            <span className="text-secondary-foreground">Knowledge Companion</span>
           </h2>
           
           <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-2xl mx-auto max-lg:text-lg max-md:text-base max-sm:text-sm max-sm:mb-6 max-sm:px-4">
@@ -48,7 +48,7 @@ export const Landing = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 max-sm:mb-8 max-sm:gap-3">
             <Link to="/auth">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white px-8 py-4 text-lg max-sm:w-full max-sm:text-base max-sm:py-3">
+              <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-8 py-4 text-lg max-sm:w-full max-sm:text-base max-sm:py-3">
                 Get Started
               </Button>
             </Link>
