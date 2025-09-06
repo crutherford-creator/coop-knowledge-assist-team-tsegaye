@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatHeader } from "@/components/ChatHeader";
 import { ChatMessage } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
+import { ChatFooter } from "@/components/ChatFooter";
 import { EmptyState } from "@/components/EmptyState";
 import { ChatThreadsSidebar } from "@/components/ChatThreadsSidebar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -338,6 +339,8 @@ export const Chat = () => {
           </div>
         </div>
       </div>
+      
+      <ChatFooter />
     </div>
   );
 };

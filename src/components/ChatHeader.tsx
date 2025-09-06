@@ -12,7 +12,7 @@ export const ChatHeader = () => {
   };
 
   return (
-    <Card className="p-4 bg-gradient-primary text-primary-foreground border-0 shadow-lg flex-shrink-0">
+    <div className="p-4 bg-gradient-primary text-primary-foreground shadow-lg flex-shrink-0">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white/20 rounded-lg max-sm:hidden">
@@ -42,6 +42,6 @@ export const ChatHeader = () => {
           </Button>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
