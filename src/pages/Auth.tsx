@@ -11,7 +11,7 @@ import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 export const Auth = () => {
-  const { user, signIn, signUp, resetPassword, updatePassword } = useAuth();
+  const { user, signIn, signUp, resetPassword, updatePassword, signOut } = useAuth();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -38,19 +38,33 @@ export const Auth = () => {
       if (params.get('type') === 'recovery' || hash.includes('type=recovery')) {
         console.log('Password recovery detected, showing update password form');
         setCurrentView("updatePassword");
+        // Clear any existing errors when entering reset mode
+        setError("");
       }
     };
 
-    // Check on mount
+    // Check immediately
     checkResetMode();
+    
+    // Also check after a small delay to catch async auth state changes
+    const timeoutId = setTimeout(checkResetMode, 100);
     
     // Listen for hash changes
     window.addEventListener('hashchange', checkResetMode);
-    return () => window.removeEventListener('hashchange', checkResetMode);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('hashchange', checkResetMode);
+    };
   }, []);
 
-  // Redirect if already authenticated
-  if (user) {
+  // Check if we're in password reset mode first, before any redirects
+  const isPasswordReset = mode === "reset" || 
+    window.location.hash.includes('type=recovery') || 
+    currentView === "updatePassword";
+
+  // Only redirect if authenticated AND not in password reset mode
+  if (user && !isPasswordReset) {
     return <Navigate to="/" replace />;
   }
 
@@ -174,7 +188,11 @@ export const Auth = () => {
         title: "Password updated!",
         description: "Your password has been successfully updated.",
       });
-      window.location.href = "/";
+      // Sign out the user after password update to ensure clean state
+      await signOut();
+      setCurrentView("signin");
+      // Clear the hash to remove recovery tokens
+      window.location.hash = "";
     }
 
     setLoading(false);
