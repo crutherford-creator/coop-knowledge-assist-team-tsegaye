@@ -28,6 +28,27 @@ export const Auth = () => {
     }
   }, [mode]);
 
+  // Handle hash fragments from email links (Supabase uses hash-based routing for auth)
+  useEffect(() => {
+    const checkResetMode = () => {
+      const hash = window.location.hash;
+      const params = new URLSearchParams(hash.substring(1));
+      
+      // Check if this is a password recovery link
+      if (params.get('type') === 'recovery' || hash.includes('type=recovery')) {
+        console.log('Password recovery detected, showing update password form');
+        setCurrentView("updatePassword");
+      }
+    };
+
+    // Check on mount
+    checkResetMode();
+    
+    // Listen for hash changes
+    window.addEventListener('hashchange', checkResetMode);
+    return () => window.removeEventListener('hashchange', checkResetMode);
+  }, []);
+
   // Redirect if already authenticated
   if (user) {
     return <Navigate to="/" replace />;
