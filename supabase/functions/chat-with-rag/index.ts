@@ -50,10 +50,21 @@ serve(async (req) => {
     const answer = ragResult.text || ragResult.answer || ragResult.message || 'I apologize, but I could not find a relevant answer in our knowledge base.';
     
     // Extract sources if available (adjust based on your Flowise response structure)
-    const sources = ragResult.sourceDocuments?.map((doc: any) => ({
-      title: doc.metadata?.title || doc.metadata?.source || 'Knowledge Base Document',
-      section: doc.metadata?.section || doc.metadata?.page ? `Page ${doc.metadata.page}` : undefined
-    })) || [];
+    const sources = ragResult.sourceDocuments?.map((doc: any) => {
+      // Try to get a meaningful document title
+      const title = doc.metadata?.title || 
+                   (doc.metadata?.pdf?.info?.Title) || 
+                   'CoopBank Policy Document';
+      
+      // Get page number from either location or direct metadata
+      const pageNumber = doc.metadata?.loc?.pageNumber || doc.metadata?.page;
+      const section = doc.metadata?.section || (pageNumber ? `Page ${pageNumber}` : undefined);
+      
+      return {
+        title,
+        section
+      };
+    }) || [];
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
