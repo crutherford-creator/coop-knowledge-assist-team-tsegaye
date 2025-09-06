@@ -4,6 +4,7 @@ import { ChatHeader } from "@/components/ChatHeader";
 import { ChatMessage } from "@/components/ChatMessage";
 import { ChatInput } from "@/components/ChatInput";
 import { EmptyState } from "@/components/EmptyState";
+import { ChatThreadsSidebar } from "@/components/ChatThreadsSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -29,6 +30,7 @@ export const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentThread, setCurrentThread] = useState<ChatThread | null>(null);
+  const [shouldRefreshThreads, setShouldRefreshThreads] = useState(0);
 
   // Create or get chat thread
   useEffect(() => {
@@ -184,7 +186,25 @@ export const Chat = () => {
         timestamp: new Date().toLocaleTimeString(),
       };
 
+      // Save assistant response to database
+      await supabase
+        .from('messages')
+        .insert({
+          thread_id: currentThread.id,
+          content: assistantMessage.content,
+          sender: 'agent',
+          metadata: ragResponse.sources ? { sources: ragResponse.sources } : null
+        });
+
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Update thread updated_at timestamp and trigger sidebar refresh
+      await supabase
+        .from('chat_threads')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', currentThread.id);
+        
+      setShouldRefreshThreads(prev => prev + 1);
       setIsLoading(false);
 
     } catch (error) {
@@ -214,37 +234,98 @@ export const Chat = () => {
     }
   };
 
+  const handleThreadSelect = async (threadId: string) => {
+    try {
+      // Fetch the selected thread
+      const { data: thread, error: threadError } = await supabase
+        .from('chat_threads')
+        .select('*')
+        .eq('id', threadId)
+        .single();
+
+      if (threadError) throw threadError;
+
+      setCurrentThread(thread);
+      await loadMessages(threadId);
+    } catch (error) {
+      console.error('Error loading thread:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load chat thread.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleNewChat = async () => {
+    try {
+      // Create new thread
+      const { data: newThread, error: createError } = await supabase
+        .from('chat_threads')
+        .insert({
+          user_id: user?.id,
+          title: 'New Chat',
+        })
+        .select()
+        .single();
+
+      if (createError) throw createError;
+
+      setCurrentThread(newThread);
+      setMessages([]);
+      setShouldRefreshThreads(prev => prev + 1);
+    } catch (error) {
+      console.error('Error creating new thread:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create new chat.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-background">
       <ChatHeader />
       
-      <div className="flex-1 container mx-auto max-w-4xl p-4 flex flex-col gap-4 overflow-hidden">
-        <ScrollArea className="flex-1 rounded-lg border bg-card">
-          <div className="p-6 space-y-6">
-            {messages.length === 0 ? (
-              <EmptyState />
-            ) : (
-              messages.map((message) => (
-                <ChatMessage
-                  key={message.id}
-                  type={message.type}
-                  content={message.content}
-                  sources={message.sources}
-                  timestamp={message.timestamp}
-                />
-              ))
-            )}
-            
-            {isLoading && (
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                <span className="text-sm">Assistant is thinking...</span>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
+      <div className="flex-1 flex">
+        <ChatThreadsSidebar
+          currentThreadId={currentThread?.id}
+          onThreadSelect={handleThreadSelect}
+          onNewChat={handleNewChat}
+          onThreadUpdate={() => setShouldRefreshThreads(prev => prev + 1)}
+        />
         
-        <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+        <div className="flex-1 flex flex-col">
+          <div className="flex-1 container mx-auto max-w-4xl p-4 flex flex-col gap-4 overflow-hidden">
+            <ScrollArea className="flex-1 rounded-lg border bg-card">
+              <div className="p-6 space-y-6">
+                {messages.length === 0 ? (
+                  <EmptyState />
+                ) : (
+                  messages.map((message) => (
+                    <ChatMessage
+                      key={message.id}
+                      type={message.type}
+                      content={message.content}
+                      sources={message.sources}
+                      timestamp={message.timestamp}
+                    />
+                  ))
+                )}
+                
+                {isLoading && (
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                    <span className="text-sm">Assistant is thinking...</span>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+            
+            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+          </div>
+        </div>
       </div>
     </div>
   );

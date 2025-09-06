@@ -19,7 +19,7 @@ export const ChatHeader = () => {
             <HelpCircle className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold">Knowledge Assistant</h1>
+            <h1 className="text-xl font-semibold">COOP Knowledge Assistant</h1>
             <p className="text-primary-foreground/80 text-sm">
               Welcome, {user?.email?.split('@')[0] || 'User'}
             </p>
