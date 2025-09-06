@@ -7,16 +7,21 @@ import { Send, Loader2 } from "lucide-react";
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading?: boolean;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
-export const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
-  const [message, setMessage] = useState("");
+export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInputProps) => {
+  const [message, setMessage] = useState(value || "");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && !isLoading) {
       onSendMessage(message.trim());
       setMessage("");
+      if (onChange) {
+        onChange("");
+      }
     }
   };
 
@@ -31,8 +36,13 @@ export const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
     <Card className="p-4 bg-card border-border shadow-lg">
       <form onSubmit={handleSubmit} className="flex gap-3">
         <Textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          value={value !== undefined ? value : message}
+          onChange={(e) => {
+            setMessage(e.target.value);
+            if (onChange) {
+              onChange(e.target.value);
+            }
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Ask a question about our policies or procedures..."
           className="min-h-[80px] resize-none bg-input border-border focus:ring-primary focus:border-primary transition-colors"

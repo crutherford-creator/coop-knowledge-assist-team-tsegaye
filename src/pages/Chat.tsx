@@ -31,6 +31,7 @@ export const Chat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentThread, setCurrentThread] = useState<ChatThread | null>(null);
   const [shouldRefreshThreads, setShouldRefreshThreads] = useState(0);
+  const [inputValue, setInputValue] = useState("");
 
   // Create or get chat thread
   useEffect(() => {
@@ -301,7 +302,7 @@ export const Chat = () => {
             <ScrollArea className="flex-1 rounded-lg border bg-card">
               <div className="p-6 space-y-6">
                 {messages.length === 0 ? (
-                  <EmptyState />
+                  <EmptyState onSuggestionClick={setInputValue} />
                 ) : (
                   messages.map((message) => (
                     <ChatMessage
@@ -323,7 +324,12 @@ export const Chat = () => {
               </div>
             </ScrollArea>
             
-            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+            <ChatInput 
+              onSendMessage={handleSendMessage} 
+              isLoading={isLoading}
+              value={inputValue}
+              onChange={setInputValue}
+            />
           </div>
         </div>
       </div>
