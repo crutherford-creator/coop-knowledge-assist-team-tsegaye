@@ -49,12 +49,16 @@ export const Chat = () => {
         .order('updated_at', { ascending: false })
         .limit(1);
 
-      if (threadsError) throw threadsError;
+      if (threadsError) {
+        console.error('Error fetching threads:', threadsError);
+        throw threadsError;
+      }
 
       if (threads && threads.length > 0) {
         // Use existing thread
-        setCurrentThread(threads[0]);
-        await loadMessages(threads[0].id);
+        const existingThread = threads[0];
+        setCurrentThread(existingThread);
+        await loadMessages(existingThread.id);
       } else {
         // Create new thread
         const { data: newThread, error: createError } = await supabase
@@ -68,14 +72,18 @@ export const Chat = () => {
           .select()
           .single();
 
-        if (createError) throw createError;
+        if (createError) {
+          console.error('Error creating thread:', createError);
+          throw createError;
+        }
+        
         setCurrentThread(newThread);
       }
     } catch (error) {
       console.error('Error initializing chat thread:', error);
       toast({
         title: "Error",
-        description: "Failed to initialize chat. Please try again.",
+        description: "Failed to initialize chat. Please refresh the page and try again.",
         variant: "destructive",
       });
     }
@@ -89,7 +97,10 @@ export const Chat = () => {
         .eq('thread_id', threadId)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading messages:', error);
+        throw error;
+      }
 
       const formattedMessages: Message[] = messagesData.map(msg => ({
         id: msg.id,
@@ -102,6 +113,11 @@ export const Chat = () => {
       setMessages(formattedMessages);
     } catch (error) {
       console.error('Error loading messages:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load chat history. Some messages may not be visible.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -147,7 +163,17 @@ export const Chat = () => {
 
       if (ragError) {
         console.error('RAG API error:', ragError);
-        throw new Error('Failed to get response from knowledge base');
+        // Fallback response if RAG fails
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: "assistant",
+          content: "I apologize, but I'm experiencing technical difficulties accessing our knowledge base. Please try again in a moment, or contact your supervisor if the issue persists.",
+          sources: [],
+          timestamp: new Date().toLocaleTimeString(),
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+        setIsLoading(false);
+        return;
       }
 
       const assistantMessage: Message = {
@@ -163,11 +189,27 @@ export const Chat = () => {
 
     } catch (error) {
       console.error('Error sending message:', error);
+      
+      // Remove the user message from UI if there was an error
+      setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
+      
+      // Show error message
+      const errorMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        type: "assistant",
+        content: "I apologize, but I encountered an error processing your message. Please try again. If the problem persists, please contact your supervisor.",
+        sources: [],
+        timestamp: new Date().toLocaleTimeString(),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+      
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
         variant: "destructive",
       });
+      
       setIsLoading(false);
     }
   };

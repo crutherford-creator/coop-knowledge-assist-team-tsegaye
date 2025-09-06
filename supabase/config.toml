@@ -1,1 +1,9 @@
 project_id = "hbzmglgyrmiejagxeskl"
+
+[auth]
+enabled = true
+external_email_enabled = true
+email_confirmation_enabled = false
+
+[functions.chat-with-rag]
+verify_jwt = true
