@@ -9,8 +9,8 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Professional background system */
-    --background: 249 250 251; /* Cool gray-50 */
-    --foreground: 15 23 42; /* Slate-900 */
+    --background: 0 0% 99%; /* Almost white */
+    --foreground: 218 13% 16%; /* Dark blue-gray */
 
     /* Card system for chat bubbles and containers */
     --card: 0 0% 100%;
@@ -26,26 +26,26 @@ All colors MUST be HSL.
     --primary-dark: 197 100% 40%;
 
     /* Professional secondary system */
-    --secondary: 241 245 249; /* Blue-gray-50 */
-    --secondary-foreground: 51 65 85; /* Blue-gray-700 */
+    --secondary: 210 20% 98%; /* Light gray background */
+    --secondary-foreground: 215 25% 27%; /* Dark text */
 
     /* Muted system for subtle elements */
-    --muted: 248 250 252; /* Slate-50 */
-    --muted-foreground: 100 116 139; /* Slate-500 */
+    --muted: 210 20% 96%; /* Light gray */
+    --muted-foreground: 215 25% 35%; /* Medium gray text */
 
     /* Accent system for highlights - CoopBank orange */
     --accent: 31 78% 52%; /* #e38524 - CoopBank orange */
     --accent-foreground: 0 0% 100%; /* White text on orange */
 
     /* Status colors */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
     /* Interactive elements */
-    --border: 226 232 240; /* Slate-200 */
-    --input: 241 245 249; /* Blue-gray-50 */
+    --border: 215 25% 88%; /* Light border */
+    --input: 210 20% 98%; /* Very light background */
     --ring: 197 100% 47%;
 
     /* Chat-specific variables */
