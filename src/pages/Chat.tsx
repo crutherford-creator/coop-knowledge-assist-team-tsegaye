@@ -288,10 +288,10 @@ export const Chat = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       <ChatHeader />
       
-      <div className="flex-1 flex">
+      <div className="flex-1 flex min-h-0">
         <ChatThreadsSidebar
           currentThreadId={currentThread?.id}
           onThreadSelect={handleThreadSelect}
@@ -299,9 +299,9 @@ export const Chat = () => {
           onThreadUpdate={() => setShouldRefreshThreads(prev => prev + 1)}
         />
         
-        <div className="flex-1 flex flex-col">
-          <div className="flex-1 container mx-auto max-w-4xl p-4 flex flex-col gap-4 overflow-hidden">
-            <ScrollArea className="flex-1 rounded-lg border bg-card">
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full p-4 gap-4 min-h-0">
+            <ScrollArea className="flex-1 rounded-lg border bg-card min-h-0">
               <div className="p-6 space-y-6">
                 {messages.length === 0 ? (
                   <EmptyState onSuggestionClick={setInputValue} />
@@ -326,13 +326,15 @@ export const Chat = () => {
               </div>
             </ScrollArea>
             
-            <ChatInput 
-              onSendMessage={handleSendMessage} 
-              isLoading={isLoading}
-              value={inputValue}
-              onChange={setInputValue}
-              lastResponse={lastResponse}
-            />
+            <div className="flex-shrink-0">
+              <ChatInput 
+                onSendMessage={handleSendMessage} 
+                isLoading={isLoading}
+                value={inputValue}
+                onChange={setInputValue}
+                lastResponse={lastResponse}
+              />
+            </div>
           </div>
         </div>
       </div>

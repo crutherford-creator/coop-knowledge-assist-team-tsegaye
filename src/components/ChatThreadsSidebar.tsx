@@ -119,7 +119,7 @@ export const ChatThreadsSidebar = ({
 
   if (isLoading) {
     return (
-      <div className="w-80 bg-sidebar-background border-r border-sidebar-border">
+      <div className="w-80 bg-sidebar-background border-r border-sidebar-border h-full max-md:w-64 max-sm:hidden">{/* Mobile responsive loading */}
         <div className="p-4 border-b border-sidebar-border">
           <Button disabled className="w-full">
             <Plus className="h-4 w-4 mr-2" />
@@ -136,7 +136,7 @@ export const ChatThreadsSidebar = ({
   }
 
   return (
-    <div className="w-80 bg-sidebar-background border-r border-sidebar-border flex flex-col">
+    <div className="w-80 bg-sidebar-background border-r border-sidebar-border flex flex-col h-full max-md:w-64 max-sm:hidden">{/* Mobile responsive sidebar */}
       {/* Header */}
       <div className="p-4 border-b border-sidebar-border">
         <Button 

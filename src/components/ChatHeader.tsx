@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { HelpCircle, Shield, Clock, LogOut } from "lucide-react";
+import { HelpCircle, Shield, LogOut, Menu } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const ChatHeader = () => {
@@ -12,46 +12,35 @@ export const ChatHeader = () => {
   };
 
   return (
-    <Card className="p-6 bg-gradient-primary text-primary-foreground border-0 shadow-lg">
+    <Card className="p-4 bg-gradient-primary text-primary-foreground border-0 shadow-lg flex-shrink-0">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-white/20 rounded-lg">
-            <HelpCircle className="h-6 w-6" />
+          <div className="p-2 bg-white/20 rounded-lg max-sm:hidden">
+            <HelpCircle className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold">COOP Knowledge Assistant</h1>
-            <p className="text-primary-foreground/80 text-sm">
+            <h1 className="text-lg font-semibold max-sm:text-base">COOP Knowledge Assistant</h1>
+            <p className="text-primary-foreground/80 text-xs max-sm:hidden">
               Welcome, {user?.email?.split('@')[0] || 'User'}
             </p>
           </div>
         </div>
         
         <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="bg-white/20 text-primary-foreground border-white/30">
+          <Badge variant="secondary" className="bg-white/20 text-primary-foreground border-white/30 max-sm:hidden">
             <Shield className="h-3 w-3 mr-1" />
-            Internal Use Only
-          </Badge>
-          <Badge variant="secondary" className="bg-white/20 text-primary-foreground border-white/30">
-            <Clock className="h-3 w-3 mr-1" />
-            Real-time
+            Internal Use
           </Badge>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleSignOut}
-            className="text-primary-foreground hover:bg-white/20 ml-2"
+            className="text-primary-foreground hover:bg-white/20"
           >
-            <LogOut className="h-4 w-4 mr-1" />
-            Sign Out
+            <LogOut className="h-4 w-4 max-sm:mr-0 sm:mr-1" />
+            <span className="max-sm:hidden">Sign Out</span>
           </Button>
         </div>
-      </div>
-      
-      <div className="mt-4 p-3 bg-white/10 rounded-lg border border-white/20">
-        <p className="text-sm text-primary-foreground/90 leading-relaxed">
-          Ask questions about policies, procedures, and customer support guidelines. 
-          I'll search our internal knowledge base and provide accurate, sourced answers to help you assist customers effectively.
-        </p>
       </div>
     </Card>
   );
