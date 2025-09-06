@@ -18,7 +18,7 @@ export const ChatHeader = () => {
           <img 
             src="/lovable-uploads/258f867f-85c8-4ed1-8679-27c9fa62bd5c.png" 
             alt="Cooperative Bank of Oromia" 
-            className="h-8 w-auto max-sm:h-6"
+            className="h-6 w-auto max-sm:h-5"
           />
           <div className="p-2 bg-white/20 rounded-lg max-sm:hidden">
             <HelpCircle className="h-5 w-5" />

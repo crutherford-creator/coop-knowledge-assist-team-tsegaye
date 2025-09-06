@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 export const Landing = () => {
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="h-screen max-h-screen overflow-hidden bg-gradient-hero flex flex-col">
       {/* Header */}
       <header className="container mx-auto px-4 py-4 max-sm:py-3">
         <div className="flex items-center justify-between">
@@ -29,7 +29,7 @@ export const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <main className="container mx-auto px-4 py-8 max-sm:py-6">
+      <main className="container mx-auto px-4 py-4 max-sm:py-3 flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto text-center">
           <Badge className="mb-4 bg-white/20 text-white border-white/30 max-sm:mb-3 max-sm:text-xs">
             <Shield className="h-3 w-3 mr-1 max-sm:h-2 max-sm:w-2" />
@@ -113,11 +113,11 @@ export const Landing = () => {
           </div>
 
           {/* Company Logo */}
-          <div className="flex justify-center mt-12 max-sm:mt-8">
+          <div className="flex justify-center mt-8 max-sm:mt-6">
             <img 
               src="/lovable-uploads/258f867f-85c8-4ed1-8679-27c9fa62bd5c.png" 
               alt="Cooperative Bank of Oromia" 
-              className="h-16 w-auto opacity-80 max-sm:h-12"
+              className="h-12 w-auto opacity-80 max-sm:h-10"
             />
           </div>
         </div>
