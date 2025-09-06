@@ -1,0 +1,39 @@
+{
+  "app": {
+    "title": "Gargaaraa Beekumsa CoopBank",
+    "subtitle": "Meeshaa Hojjettoota Gargaarsa Keessaa"
+  },
+  "auth": {
+    "signIn": "Seeni"
+  },
+  "landing": {
+    "internalUse": "Itti Fayyadama Keessaatiif Qofa",
+    "heroTitle": "Hiriyyaa",
+    "heroSubtitle": "Beekumsa Sammuu Qabuu Kee",
+    "heroDescription": "Kuusaa beekumsa keessaa bal'aa ta'e battalumatti argadhu. Deeggartoota haala bu'a qabeessa fi gahumsaan gargaaruuf deebii sirrii fi madda qaban argadhu.",
+    "getStarted": "Jalqabi",
+    "learnMore": "Dabalataan Baradhu",
+    "features": {
+      "instantAnswers": {
+        "title": "Deebii Battalumaa",
+        "description": "Kuusaa beekumsa bal'aa keetii irraa deebii battalumaa madda waabii wajjin argadhu."
+      },
+      "policyGuidance": {
+        "title": "Qajeelfama Imaammata",
+        "description": "Imaammata, adeemsa, fi qajeelfama deeggarsa maamilaa haaraa ta'e argadhu."
+      },
+      "teamEfficiency": {
+        "title": "Bu'a Qabeessummaa Garee",
+        "description": "Tajaajila maamiltootaa fooyya'aa ta'eef odeeffannoo walsimannaa fi sirrii ta'e garee kee hummeessi."
+      }
+    },
+    "status": {
+      "realTimeUpdates": "Fooyya'iinsa Yeroo Dhugaa",
+      "secureAccess": "Dhaqqabummaa Nageenyaa"
+    },
+    "companyName": "Baankii Kooperaatiivii Oromiyaa"
+  },
+  "footer": {
+    "copyright": "© {{year}} Baankii Kooperaatiivii Oromiyaa. Mirgoota hundi ni eegaman."
+  }
+}

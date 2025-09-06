@@ -1,0 +1,39 @@
+{
+  "app": {
+    "title": "የኮኦፕ ባንክ እውቀት ረዳት",
+    "subtitle": "የውስጥ የድጋፍ ሰራተኞች መሳሪያ"
+  },
+  "auth": {
+    "signIn": "ግባ"
+  },
+  "landing": {
+    "internalUse": "ለውስጥ አጠቃቀም ብቻ",
+    "heroTitle": "የእርስዎ ብልህ",
+    "heroSubtitle": "የእውቀት አጋር",
+    "heroDescription": "ሁሉን ተቀፍ የውስጥ የእውቀት ቋት በቅጽበት ደረስ። ደንበኞችን በሚገባ እና በወጪ ርጋታ ለመርዳት ትክክለኛ፣ ምንጭ ያላቸው መልሶች ያግኙ።",
+    "getStarted": "ጀምር",
+    "learnMore": "ተጨማሪ ተማር",
+    "features": {
+      "instantAnswers": {
+        "title": "ቅጽበታዊ መልሶች",
+        "description": "ከአጠቃላይ የእውቀት ቋትዎ ጋር የምንጭ ጥቅሶች ያሉት ቅጽበታዊ ምላሾች ያግኙ።"
+      },
+      "policyGuidance": {
+        "title": "የፖሊሲ መመሪያ",
+        "description": "የተዘመኑ ፖሊሲዎች፣ ሂደቶች፣ እና የደንበኞች ድጋፍ መመሪያዎች ደረስ።"
+      },
+      "teamEfficiency": {
+        "title": "የቡድን ውጤታማነት",
+        "description": "ለተሻለ የደንበኞች አገልግሎት ተከታታይ፣ ትክክለኛ መረጃ ቡድንዎን ያበረታቱ።"
+      }
+    },
+    "status": {
+      "realTimeUpdates": "የእውነተኛ ጊዜ ማዘመኛዎች",
+      "secureAccess": "ደህንነቱ የተጠበቀ መዳረሻ"
+    },
+    "companyName": "የኦሮሚያ ኮኦፐሬቲቭ ባንክ"
+  },
+  "footer": {
+    "copyright": "© {{year}} የኦሮሚያ ኮኦፐሬቲቭ ባንክ። ሁሉም መብቶች የተጠበቁ ናቸው።"
+  }
+}

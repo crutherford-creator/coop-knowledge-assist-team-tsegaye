@@ -1,0 +1,39 @@
+{
+  "app": {
+    "title": "CoopBank Knowledge Assistant",
+    "subtitle": "Internal Support Staff Tool"
+  },
+  "auth": {
+    "signIn": "Sign In"
+  },
+  "landing": {
+    "internalUse": "Internal Use Only",
+    "heroTitle": "Your Intelligent",
+    "heroSubtitle": "Knowledge Companion",
+    "heroDescription": "Access our comprehensive internal knowledge base instantly. Get accurate, sourced answers to help you assist customers effectively and efficiently.",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "features": {
+      "instantAnswers": {
+        "title": "Instant Answers",
+        "description": "Get immediate responses from our comprehensive knowledge base with source citations."
+      },
+      "policyGuidance": {
+        "title": "Policy Guidance",
+        "description": "Access up-to-date policies, procedures, and customer support guidelines."
+      },
+      "teamEfficiency": {
+        "title": "Team Efficiency",
+        "description": "Empower your team with consistent, accurate information for better customer service."
+      }
+    },
+    "status": {
+      "realTimeUpdates": "Real-time Updates",
+      "secureAccess": "Secure Access"
+    },
+    "companyName": "Cooperative Bank of Oromia"
+  },
+  "footer": {
+    "copyright": "© {{year}} Cooperative Bank of Oromia. All rights reserved."
+  }
+}
