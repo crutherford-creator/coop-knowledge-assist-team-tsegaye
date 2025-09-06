@@ -72,7 +72,7 @@ export const Landing = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 max-sm:mb-8 max-sm:gap-3">
-            <Link to="/chat">
+            <Link to={user ? "/chat" : "/auth"}>
               <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-white px-8 py-4 text-lg max-sm:w-full max-sm:text-base max-sm:py-3">
                 {t('landing.getStarted')}
               </Button>
