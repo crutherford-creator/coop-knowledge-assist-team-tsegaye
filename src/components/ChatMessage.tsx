@@ -37,27 +37,6 @@ export const ChatMessage = ({ type, content, sources, timestamp }: ChatMessagePr
           <div className="whitespace-pre-wrap text-sm leading-relaxed">
             {content}
           </div>
-          
-          {sources && sources.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-border/30">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="h-3 w-3 text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground">Sources:</span>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {sources.map((source, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="secondary" 
-                    className="text-xs bg-muted hover:bg-muted/80"
-                  >
-                    {source.title}
-                    {source.section && ` - ${source.section}`}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
         </Card>
         
         {timestamp && (
