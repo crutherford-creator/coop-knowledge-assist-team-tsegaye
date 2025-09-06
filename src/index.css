@@ -8,33 +8,33 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Professional background system */
-    --background: 0 0% 99%; /* Almost white */
-    --foreground: 218 13% 16%; /* Dark blue-gray */
+    /* Clean white background system */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 0 0% 0%; /* Pure black */
 
     /* Card system for chat bubbles and containers */
-    --card: 0 0% 100%;
-    --card-foreground: 15 23 42;
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 0 0% 0%; /* Black text */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 15 23 42;
+    --popover-foreground: 0 0% 0%;
 
-    /* CoopBank of Oromia primary system */
-    --primary: 197 100% 47%; /* #00adef - CoopBank blue */
-    --primary-foreground: 0 0% 100%;
+    /* CoopBank Primary Color - Blue #00adef */
+    --primary: 197 100% 47%; /* #00adef */
+    --primary-foreground: 0 0% 100%; /* White text on blue */
     --primary-light: 197 100% 55%;
     --primary-dark: 197 100% 40%;
 
-    /* Professional secondary system */
-    --secondary: 210 20% 98%; /* Light gray background */
-    --secondary-foreground: 215 25% 27%; /* Dark text */
+    /* CoopBank Secondary Color - Black #000000 */
+    --secondary: 0 0% 96%; /* Very light gray for backgrounds */
+    --secondary-foreground: 0 0% 0%; /* Black text */
 
     /* Muted system for subtle elements */
-    --muted: 210 20% 96%; /* Light gray */
-    --muted-foreground: 215 25% 35%; /* Medium gray text */
+    --muted: 0 0% 98%; /* Very light gray */
+    --muted-foreground: 0 0% 45%; /* Medium gray text */
 
-    /* Accent system for highlights - CoopBank orange */
-    --accent: 31 78% 52%; /* #e38524 - CoopBank orange */
+    /* CoopBank Accent Color - Orange #e38524 */
+    --accent: 31 78% 52%; /* #e38524 */
     --accent-foreground: 0 0% 100%; /* White text on orange */
 
     /* Status colors */
@@ -44,47 +44,41 @@ All colors MUST be HSL.
     --success-foreground: 0 0% 100%;
 
     /* Interactive elements */
-    --border: 215 25% 88%; /* Light border */
-    --input: 210 20% 98%; /* Very light background */
-    --ring: 197 100% 47%;
+    --border: 0 0% 90%; /* Light gray borders */
+    --input: 0 0% 98%; /* Very light gray input backgrounds */
+    --ring: 197 100% 47%; /* Primary blue for focus rings */
 
     /* Chat-specific variables */
-    --chat-user-bg: 197 100% 47%;
-    --chat-assistant-bg: 0 0% 100%;
-    --chat-user-text: 0 0% 100%;
-    --chat-assistant-text: 15 23 42;
+    --chat-user-bg: 197 100% 47%; /* CoopBank blue */
+    --chat-assistant-bg: 0 0% 98%; /* Very light gray */
+    --chat-user-text: 0 0% 100%; /* White */
+    --chat-assistant-text: 0 0% 0%; /* Black */
 
     /* CoopBank gradients */
     --gradient-primary: linear-gradient(135deg, hsl(197 100% 47%), hsl(197 100% 55%));
-    --gradient-secondary: linear-gradient(135deg, hsl(248 250 252), hsl(241 245 249));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 0% 98%));
     --gradient-hero: linear-gradient(135deg, hsl(197 100% 47%) 0%, hsl(31 78% 52%) 100%);
 
-    /* Professional shadows */
+    /* Clean shadows */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
     --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
     --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
 
-    /* Animations */
+    /* Smooth animations */
     --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar colors */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 0%;
+    --sidebar-primary: 197 100% 47%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 197 100% 47%;
   }
 
   .dark {
