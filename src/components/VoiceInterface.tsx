@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface VoiceInterfaceProps {
   onTranscription: (text: string) => void;
-  onPlayAudio: (text: string) => void;
+  onPlayAudio: () => void;
   isListening?: boolean;
   isPlaying?: boolean;
 }
@@ -212,7 +212,7 @@ export const VoiceInterface = ({
 
         <div className="flex flex-col items-center gap-2">
           <Button
-            onClick={() => onPlayAudio}
+            onClick={() => onPlayAudio()}
             disabled={finalIsListening || isProcessing}
             variant={finalIsPlaying ? "destructive" : "outline"}
             size="lg"

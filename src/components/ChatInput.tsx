@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Send, Loader2 } from "lucide-react";
 import { VoiceInterface } from "./VoiceInterface";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -45,8 +46,36 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange, lastRespo
     console.log('Voice transcription received:', cleanText);
   };
 
-  const handlePlayAudio = (text: string) => {
-    // This will be handled by the VoiceInterface component
+  const handlePlayAudio = async (text: string) => {
+    if (!text || !text.trim()) {
+      console.log('No text to play');
+      return;
+    }
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('text-to-speech', {
+        body: { 
+          text: text.trim(), 
+          voice: 'alloy' 
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.audioContent) {
+        const audio = new Audio();
+        const audioBlob = new Blob(
+          [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
+          { type: 'audio/mpeg' }
+        );
+        const audioUrl = URL.createObjectURL(audioBlob);
+        audio.src = audioUrl;
+        audio.play();
+        audio.onended = () => URL.revokeObjectURL(audioUrl);
+      }
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    }
   };
 
   return (
