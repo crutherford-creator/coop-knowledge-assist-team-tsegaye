@@ -32,6 +32,7 @@ export const Chat = () => {
   const [currentThread, setCurrentThread] = useState<ChatThread | null>(null);
   const [shouldRefreshThreads, setShouldRefreshThreads] = useState(0);
   const [inputValue, setInputValue] = useState("");
+  const [lastResponse, setLastResponse] = useState("");
 
   // Create or get chat thread
   useEffect(() => {
@@ -198,6 +199,7 @@ export const Chat = () => {
         });
 
       setMessages(prev => [...prev, assistantMessage]);
+      setLastResponse(assistantMessage.content);
       
       // Update thread updated_at timestamp and trigger sidebar refresh
       await supabase
@@ -329,6 +331,7 @@ export const Chat = () => {
               isLoading={isLoading}
               value={inputValue}
               onChange={setInputValue}
+              lastResponse={lastResponse}
             />
           </div>
         </div>
