@@ -111,6 +111,15 @@ export const Landing = () => {
               Secure Access
             </Badge>
           </div>
+
+          {/* Company Logo */}
+          <div className="flex justify-center mt-12 max-sm:mt-8">
+            <img 
+              src="/lovable-uploads/258f867f-85c8-4ed1-8679-27c9fa62bd5c.png" 
+              alt="Cooperative Bank of Oromia" 
+              className="h-16 w-auto opacity-80 max-sm:h-12"
+            />
+          </div>
         </div>
       </main>
     </div>
