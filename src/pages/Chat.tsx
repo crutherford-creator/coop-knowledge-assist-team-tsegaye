@@ -134,50 +134,32 @@ export const Chat = () => {
 
       if (userMessageError) throw userMessageError;
 
-      // Simulate assistant response (replace with actual RAG API call)
-      setTimeout(async () => {
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          type: "assistant",
-          content: `Thank you for your question: "${message}". This is a simulated response from our knowledge base. In the full implementation, this would connect to your RAG system in Flowise to provide accurate, sourced answers based on your internal documents.`,
-          sources: [
-            { title: "Employee Handbook", section: "Section 4.2" },
-            { title: "Customer Service Guidelines", section: "FAQ #15" }
-          ],
-          timestamp: new Date().toLocaleTimeString(),
-        };
-
-        setMessages(prev => [...prev, assistantMessage]);
-
-        // Save assistant message to database
-        try {
-          const { error: assistantMessageError } = await supabase
-            .from('messages')
-            .insert([
-              {
-                thread_id: currentThread.id,
-                sender: 'agent',
-                content: assistantMessage.content,
-                metadata: {
-                  sources: assistantMessage.sources
-                }
-              }
-            ]);
-
-          if (assistantMessageError) throw assistantMessageError;
-
-          // Update thread updated_at timestamp
-          await supabase
-            .from('chat_threads')
-            .update({ updated_at: new Date().toISOString() })
-            .eq('id', currentThread.id);
-
-        } catch (error) {
-          console.error('Error saving assistant message:', error);
+      // Call Flowise RAG system via edge function
+      const { data: ragResponse, error: ragError } = await supabase.functions.invoke(
+        'chat-with-rag',
+        {
+          body: {
+            question: message,
+            threadId: currentThread.id
+          }
         }
+      );
 
-        setIsLoading(false);
-      }, 1500);
+      if (ragError) {
+        console.error('RAG API error:', ragError);
+        throw new Error('Failed to get response from knowledge base');
+      }
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "assistant",
+        content: ragResponse.answer,
+        sources: ragResponse.sources || [],
+        timestamp: new Date().toLocaleTimeString(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+      setIsLoading(false);
 
     } catch (error) {
       console.error('Error sending message:', error);
