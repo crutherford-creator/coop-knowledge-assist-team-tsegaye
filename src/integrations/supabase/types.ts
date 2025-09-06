@@ -14,66 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      tasks: {
+      chat_threads: {
         Row: {
           created_at: string | null
           id: string
-          is_done: boolean | null
-          title: string
-          user_id: string | null
+          title: string | null
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: string
-          is_done?: boolean | null
-          title: string
-          user_id?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
           id?: string
-          is_done?: boolean | null
-          title?: string
-          user_id?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
-      users: {
+      messages: {
         Row: {
-          "contact details": string | null
-          fun_fact: string | null
-          interests: string | null
-          location: string | null
-          name: string
-          role: string | null
+          content: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          sender: Database["public"]["Enums"]["message_sender"]
+          thread_id: string
         }
         Insert: {
-          "contact details"?: string | null
-          fun_fact?: string | null
-          interests?: string | null
-          location?: string | null
-          name: string
-          role?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          sender: Database["public"]["Enums"]["message_sender"]
+          thread_id: string
         }
         Update: {
-          "contact details"?: string | null
-          fun_fact?: string | null
-          interests?: string | null
-          location?: string | null
-          name?: string
-          role?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          sender?: Database["public"]["Enums"]["message_sender"]
+          thread_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_chat_threads: {
+        Args: { thread_limit?: number; user_uuid: string }
+        Returns: {
+          created_at: string
+          id: string
+          last_message_preview: string
+          message_count: number
+          title: string
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      message_sender: "user" | "agent"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -200,6 +218,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      message_sender: ["user", "agent"],
+    },
   },
 } as const
