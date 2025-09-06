@@ -28,7 +28,7 @@ serve(async (req) => {
 
     // Query Flowise RAG system
     const flowiseResponse = await fetch(
-      "https://cloud.flowiseai.com/api/v1/prediction/a4b352cc-50f3-4221-b63e-b41ac3cf7949",
+      "https://cloud.flowiseai.com/api/v1/prediction/85fa5000-8173-4a5c-afc7-c84bf033fd27",
       {
         method: "POST",
         headers: {
