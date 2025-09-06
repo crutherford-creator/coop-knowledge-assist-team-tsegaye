@@ -105,7 +105,13 @@ export const VoiceInterface = ({
         }
 
         if (data.text && data.text.trim()) {
-          onTranscription(data.text.trim());
+          const cleanText = data.text.trim();
+          console.log('Transcribed text:', cleanText);
+          onTranscription(cleanText);
+          toast({
+            title: "Speech Recognized",
+            description: `"${cleanText}"`,
+          });
         } else {
           toast({
             title: "No Speech Detected",

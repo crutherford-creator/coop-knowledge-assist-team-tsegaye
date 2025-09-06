@@ -18,8 +18,10 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange, lastRespo
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() && !isLoading) {
-      onSendMessage(message.trim());
+    const currentMessage = value !== undefined ? value : message;
+    console.log('Submitting message:', currentMessage);
+    if (currentMessage.trim() && !isLoading) {
+      onSendMessage(currentMessage.trim());
       setMessage("");
       if (onChange) {
         onChange("");
@@ -35,10 +37,12 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange, lastRespo
   };
 
   const handleVoiceTranscription = (text: string) => {
-    setMessage(text);
+    const cleanText = text.trim();
+    setMessage(cleanText);
     if (onChange) {
-      onChange(text);
+      onChange(cleanText);
     }
+    console.log('Voice transcription received:', cleanText);
   };
 
   const handlePlayAudio = (text: string) => {
@@ -69,7 +73,7 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange, lastRespo
           />
           <Button
             type="submit"
-            disabled={!message.trim() || isLoading}
+            disabled={!(value !== undefined ? value.trim() : message.trim()) || isLoading}
             className="bg-primary hover:bg-primary-dark text-primary-foreground px-6 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
           >
             {isLoading ? (
