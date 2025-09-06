@@ -65,7 +65,7 @@ export const Auth = () => {
 
   // Only redirect if authenticated AND not in password reset mode
   if (user && !isPasswordReset) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/chat" replace />;
   }
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {

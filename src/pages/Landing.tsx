@@ -5,9 +5,11 @@ import { MessageCircle, Shield, Clock, Users, BookOpen, Zap } from "lucide-react
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Landing = () => {
   const { t } = useTranslation();
+  const { user, signOut } = useAuth();
 
   return (
     <div className="h-screen max-h-screen overflow-hidden bg-gradient-hero flex flex-col">
@@ -26,11 +28,28 @@ export const Landing = () => {
           
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
-            <Link to="/auth">
-              <Button variant="secondary" className="bg-white/20 text-white border-white/30 hover:bg-white/30 max-sm:text-sm max-sm:px-3">
-                {t('auth.signIn')}
-              </Button>
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <Link to="/chat">
+                  <Button variant="secondary" className="bg-white/20 text-white border-white/30 hover:bg-white/30 max-sm:text-sm max-sm:px-3">
+                    Go to Chat
+                  </Button>
+                </Link>
+                <Button 
+                  onClick={signOut}
+                  variant="outline" 
+                  className="bg-white/10 text-white border-white/20 hover:bg-white/20 max-sm:text-sm max-sm:px-3"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Link to="/auth">
+                <Button variant="secondary" className="bg-white/20 text-white border-white/30 hover:bg-white/30 max-sm:text-sm max-sm:px-3">
+                  {t('auth.signIn')}
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </header>
