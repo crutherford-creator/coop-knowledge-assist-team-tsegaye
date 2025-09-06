@@ -47,12 +47,14 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange, lastRespo
   };
 
   const handlePlayAudio = async (text: string) => {
+    console.log('handlePlayAudio called with text:', text);
     if (!text || !text.trim()) {
       console.log('No text to play');
       return;
     }
     
     try {
+      console.log('Calling text-to-speech function...');
       const { data, error } = await supabase.functions.invoke('text-to-speech', {
         body: { 
           text: text.trim(), 
@@ -60,6 +62,7 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange, lastRespo
         }
       });
 
+      console.log('TTS response:', { data, error });
       if (error) throw error;
 
       if (data?.audioContent) {
