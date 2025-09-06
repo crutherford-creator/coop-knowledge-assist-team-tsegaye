@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,14 +7,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MessageCircle, ArrowLeft } from "lucide-react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 export const Auth = () => {
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, resetPassword, updatePassword } = useAuth();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [currentView, setCurrentView] = useState("signin");
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+
+  const mode = searchParams.get("mode");
+
+  // Check if we're in password reset mode
+  useEffect(() => {
+    if (mode === "reset") {
+      setCurrentView("updatePassword");
+    }
+  }, [mode]);
 
   // Redirect if already authenticated
   if (user) {
@@ -84,6 +96,69 @@ export const Auth = () => {
     setLoading(false);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+
+    const { error } = await resetPassword(email);
+
+    if (error) {
+      setError(error.message);
+      toast({
+        title: "Reset failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      setResetEmailSent(true);
+      toast({
+        title: "Reset email sent!",
+        description: "Check your email for password reset instructions.",
+      });
+    }
+
+    setLoading(false);
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const formData = new FormData(e.currentTarget);
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await updatePassword(password);
+
+    if (error) {
+      setError(error.message);
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Password updated!",
+        description: "Your password has been successfully updated.",
+      });
+      window.location.href = "/";
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -113,7 +188,110 @@ export const Auth = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="signin" className="w-full">
+            {currentView === "updatePassword" ? (
+              <div>
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold">Set New Password</h3>
+                  <p className="text-sm text-muted-foreground">Enter your new password below</p>
+                </div>
+                
+                <form onSubmit={handleUpdatePassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="new-password">New Password</Label>
+                    <Input
+                      id="new-password"
+                      name="password"
+                      type="password"
+                      required
+                      disabled={loading}
+                      minLength={6}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+                    <Input
+                      id="confirm-new-password"
+                      name="confirmPassword"
+                      type="password"
+                      required
+                      disabled={loading}
+                      minLength={6}
+                    />
+                  </div>
+
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "Updating..." : "Update Password"}
+                  </Button>
+                </form>
+              </div>
+            ) : currentView === "forgotPassword" ? (
+              <div>
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold">Reset Password</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Enter your email address and we'll send you a link to reset your password
+                  </p>
+                </div>
+
+                {resetEmailSent ? (
+                  <div className="text-center space-y-4">
+                    <Alert>
+                      <AlertDescription>
+                        Password reset email sent! Check your inbox and follow the instructions to reset your password.
+                      </AlertDescription>
+                    </Alert>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {setCurrentView("signin"); setResetEmailSent(false);}}
+                      className="w-full"
+                    >
+                      Back to Sign In
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleForgotPassword} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-email">Email</Label>
+                      <Input
+                        id="reset-email"
+                        name="email"
+                        type="email"
+                        placeholder="your.email@coopbank.com"
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+
+                    {error && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
+                    )}
+
+                    <Button type="submit" className="w-full" disabled={loading}>
+                      {loading ? "Sending..." : "Send Reset Email"}
+                    </Button>
+                    
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      onClick={() => setCurrentView("signin")}
+                      className="w-full"
+                    >
+                      Back to Sign In
+                    </Button>
+                  </form>
+                )}
+              </div>
+            ) : (
+            <Tabs value={currentView} onValueChange={setCurrentView} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -153,6 +331,17 @@ export const Auth = () => {
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Signing in..." : "Sign In"}
                   </Button>
+                  
+                  <div className="text-center">
+                    <Button 
+                      type="button"
+                      variant="link" 
+                      onClick={() => setCurrentView("forgotPassword")}
+                      className="text-sm text-muted-foreground hover:text-primary"
+                    >
+                      Forgot your password?
+                    </Button>
+                  </div>
                 </form>
               </TabsContent>
               
@@ -204,6 +393,7 @@ export const Auth = () => {
                 </form>
               </TabsContent>
             </Tabs>
+            )}
           </CardContent>
         </Card>
       </div>
