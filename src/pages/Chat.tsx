@@ -36,14 +36,14 @@ export const Chat = () => {
   const [inputValue, setInputValue] = useState("");
   const [lastResponse, setLastResponse] = useState("");
 
-  // Create or get chat thread
+  // Load existing thread on mount
   useEffect(() => {
     if (user) {
-      initializeChatThread();
+      loadExistingThread();
     }
   }, [user]);
 
-  const initializeChatThread = async () => {
+  const loadExistingThread = async () => {
     if (!user) return;
 
     try {
@@ -65,33 +65,68 @@ export const Chat = () => {
         const existingThread = threads[0];
         setCurrentThread(existingThread);
         await loadMessages(existingThread.id);
-      } else {
-        // Create new thread
-        const { data: newThread, error: createError } = await supabase
-          .from('chat_threads')
-          .insert([
-            {
-              user_id: user.id,
-              title: 'New Chat'
-            }
-          ])
-          .select()
-          .single();
-
-        if (createError) {
-          console.error('Error creating thread:', createError);
-          throw createError;
-        }
-        
-        setCurrentThread(newThread);
       }
+      // Don't create thread automatically - wait for user action
     } catch (error) {
-      console.error('Error initializing chat thread:', error);
+      console.error('Error loading existing threads:', error);
       toast({
         title: "Error",
-        description: "Failed to initialize chat. Please refresh the page and try again.",
+        description: "Failed to load chat history. Please refresh the page and try again.",
         variant: "destructive",
       });
+    }
+  };
+
+  // Generate smart title from first message
+  const generateChatTitle = (message: string): string => {
+    // Take first 50 characters and add ellipsis if longer
+    const maxLength = 50;
+    const cleanMessage = message.trim();
+    
+    if (cleanMessage.length <= maxLength) {
+      return cleanMessage;
+    }
+    
+    // Try to break at word boundary
+    const truncated = cleanMessage.substring(0, maxLength);
+    const lastSpaceIndex = truncated.lastIndexOf(' ');
+    
+    if (lastSpaceIndex > maxLength * 0.6) {
+      return truncated.substring(0, lastSpaceIndex) + "...";
+    }
+    
+    return truncated + "...";
+  };
+
+  // Create thread when user starts typing
+  const ensureThreadExists = async (): Promise<ChatThread | null> => {
+    if (currentThread) return currentThread;
+    
+    if (!user) return null;
+
+    try {
+      const { data: newThread, error: createError } = await supabase
+        .from('chat_threads')
+        .insert({
+          user_id: user.id,
+          title: 'New Chat',
+        })
+        .select()
+        .single();
+
+      if (createError) throw createError;
+
+      setCurrentThread(newThread);
+      setShouldRefreshThreads(prev => prev + 1);
+      return newThread;
+    } catch (error) {
+      console.error('Error creating thread:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create new chat.",
+        variant: "destructive",
+      });
+      return null;
     }
   };
 
@@ -128,9 +163,16 @@ export const Chat = () => {
   };
 
   const handleSendMessage = async (message: string) => {
-    if (!user || !currentThread) return;
+    if (!user) return;
+
+    // Ensure thread exists before sending message
+    const thread = await ensureThreadExists();
+    if (!thread) return;
 
     setIsLoading(true);
+    
+    // Check if this is the first message in the thread
+    const isFirstMessage = messages.length === 0;
     
     // Add user message to UI immediately
     const userMessage: Message = {
@@ -148,7 +190,7 @@ export const Chat = () => {
         .from('messages')
         .insert([
           {
-            thread_id: currentThread.id,
+            thread_id: thread.id,
             sender: 'user',
             content: message,
           }
@@ -156,13 +198,27 @@ export const Chat = () => {
 
       if (userMessageError) throw userMessageError;
 
+      // Update thread title if this is the first message
+      if (isFirstMessage) {
+        const newTitle = generateChatTitle(message);
+        const { error: titleError } = await supabase
+          .from('chat_threads')
+          .update({ title: newTitle })
+          .eq('id', thread.id);
+
+        if (!titleError) {
+          setCurrentThread(prev => prev ? { ...prev, title: newTitle } : prev);
+          setShouldRefreshThreads(prev => prev + 1);
+        }
+      }
+
       // Call Flowise RAG system via edge function
       const { data: ragResponse, error: ragError } = await supabase.functions.invoke(
         'chat-with-rag',
         {
           body: {
             question: message,
-            threadId: currentThread.id
+            threadId: thread.id
           }
         }
       );
