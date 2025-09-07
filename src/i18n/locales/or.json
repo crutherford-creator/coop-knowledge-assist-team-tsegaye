@@ -4,7 +4,60 @@
     "subtitle": "Meeshaa Hojjettoota Gargaarsa Keessaa"
   },
   "auth": {
-    "signIn": "Seeni"
+    "signIn": "Seeni",
+    "signUp": "Galmee Banuu",
+    "backToLanding": "Gara fuula jalqabaatti",
+    "accessAccount": "Akkaawnti Kee Argadhu",
+    "signInDescription": "Kuusaa beekumsa keessaa argachuuf seeni",
+    "email": "Imeelii",
+    "password": "Jecha icciitii",
+    "confirmPassword": "Jecha icciitii mirkaneessi",
+    "forgotPassword": "Jecha icciitii kee irraanfatee?",
+    "createAccount": "Akkaawnti Uumi",
+    "signingIn": "Seenutti jira...",
+    "creatingAccount": "Akkaawnti uumuu...",
+    "resetPassword": "Jecha Icciitii Irra Deebi'i",
+    "resetPasswordDescription": "Teessoo imeelii kee galchi, jecha icciitii kee irra deebisuuf linki ni ergina",
+    "sendResetEmail": "Imeelii Irra Deebii Ergi",
+    "sending": "Erguu...",
+    "backToSignIn": "Gara seenuutti deebii",
+    "setNewPassword": "Jecha Icciitii Haaraa Kaa'i",
+    "setNewPasswordDescription": "Armaan gaditti jecha icciitii haaraa kee galchi",
+    "newPassword": "Jecha Icciitii Haaraa",
+    "confirmNewPassword": "Jecha Icciitii Haaraa Mirkaneessi",
+    "updatePassword": "Jecha Icciitii Fooyya'i",
+    "updating": "Fooyya'uu...",
+    "passwordsDoNotMatch": "Jecha icciitiin wal hin simu",
+    "resetEmailSent": "Imeeliin irra deebi'uu jecha icciitii ergame! Jecha icciitii kee akkamitti akka irra deebiftu qajeelfama argachuuf saanduqa imeelii kee ilaali."
+  },
+  "chat": {
+    "welcome": "Baga nagaan dhuften",
+    "internalUse": "Itti Fayyadama Keessaatiif",
+    "signOut": "Ba'i",
+    "newChat": "Haasawa Haaraa",
+    "suggestedQuestions": "Gaaffilee Yaadamanii",
+    "typeMessage": "Ergaa kee barreessi...",
+    "send": "Ergi",
+    "askQuestion": "Jalqabuuf gaaffii gaafadhu",
+    "thinking": "Yaada...",
+    "noChats": "Ammallee seenaa haasawaa hin jiru",
+    "startConversation": "Sarduraa haasawa keetii asitti arguuf haasawa jalqabi.",
+    "messagesCount": "Ergaawwan {{count}}",
+    "lastUpdated": "Yeroo dhumaa fooyya'e {{time}}",
+    "features": {
+      "instantAccess": {
+        "title": "Argannaa Battalumaa",
+        "description": "Kuusaa beekumsa keenya irraa deebii battalumaa argadhu"
+      },
+      "reliableInfo": {
+        "title": "Odeeffannoo Amanamaa",
+        "description": "Deebiiwwan hundi galmee mirkaneeffaman irraa kan argaman"
+      },
+      "efficientSupport": {
+        "title": "Gargaarsa Bu'a Qabeessa",
+        "description": "Maamiltoota odeeffannoo sirrii ta'e itte saffisaan gargaari"
+      }
+    }
   },
   "landing": {
     "internalUse": "Itti Fayyadama Keessaatiif Qofa",

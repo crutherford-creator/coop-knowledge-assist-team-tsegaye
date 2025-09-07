@@ -4,7 +4,60 @@
     "subtitle": "Internal Support Staff Tool"
   },
   "auth": {
-    "signIn": "Sign In"
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "backToLanding": "Back to landing",
+    "accessAccount": "Access Your Account",
+    "signInDescription": "Sign in to access the internal knowledge base",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot your password?",
+    "createAccount": "Create Account",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "resetPassword": "Reset Password",
+    "resetPasswordDescription": "Enter your email address and we'll send you a link to reset your password",
+    "sendResetEmail": "Send Reset Email",
+    "sending": "Sending...",
+    "backToSignIn": "Back to Sign In",
+    "setNewPassword": "Set New Password",
+    "setNewPasswordDescription": "Enter your new password below",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "updatePassword": "Update Password",
+    "updating": "Updating...",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "resetEmailSent": "Password reset email sent! Check your inbox and follow the instructions to reset your password."
+  },
+  "chat": {
+    "welcome": "Welcome",
+    "internalUse": "Internal Use",
+    "signOut": "Sign Out",
+    "newChat": "New Chat",
+    "suggestedQuestions": "Suggested Questions",
+    "typeMessage": "Type your message...",
+    "send": "Send",
+    "askQuestion": "Ask a question to get started",
+    "thinking": "Thinking...",
+    "noChats": "No chat history yet",
+    "startConversation": "Start a conversation to see your chat threads here.",
+    "messagesCount": "{{count}} messages",
+    "lastUpdated": "Last updated {{time}}",
+    "features": {
+      "instantAccess": {
+        "title": "Instant Access",
+        "description": "Get immediate answers from our knowledge base"
+      },
+      "reliableInfo": {
+        "title": "Reliable Information", 
+        "description": "All responses are sourced from verified documents"
+      },
+      "efficientSupport": {
+        "title": "Efficient Support",
+        "description": "Help customers faster with accurate information"
+      }
+    }
   },
   "landing": {
     "internalUse": "Internal Use Only",

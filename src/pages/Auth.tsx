@@ -9,10 +9,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MessageCircle, ArrowLeft } from "lucide-react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export const Auth = () => {
   const { user, signIn, signUp, resetPassword, updatePassword, signOut } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -107,7 +110,7 @@ export const Auth = () => {
     const confirmPassword = formData.get("confirmPassword") as string;
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('auth.passwordsDoNotMatch'));
       setLoading(false);
       return;
     }
@@ -169,7 +172,7 @@ export const Auth = () => {
     const confirmPassword = formData.get("confirmPassword") as string;
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('auth.passwordsDoNotMatch'));
       setLoading(false);
       return;
     }
@@ -203,17 +206,20 @@ export const Auth = () => {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 text-white hover:text-white/80 mb-4">
-            <ArrowLeft className="h-4 w-4" />
-            Back to landing
-          </Link>
+          <div className="flex justify-between items-center mb-4">
+            <Link to="/" className="inline-flex items-center gap-2 text-white hover:text-white/80">
+              <ArrowLeft className="h-4 w-4" />
+              {t('auth.backToLanding')}
+            </Link>
+            <LanguageSwitcher />
+          </div>
           
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="p-2 bg-white/20 rounded-lg">
               <MessageCircle className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">CoopBank Knowledge Assistant</h1>
+              <h1 className="text-xl font-bold text-white">{t('app.title')}</h1>
             </div>
           </div>
         </div>
@@ -221,22 +227,22 @@ export const Auth = () => {
         {/* Auth Card */}
         <Card className="bg-white/95 backdrop-blur-sm border-white/20">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Access Your Account</CardTitle>
+            <CardTitle className="text-2xl">{t('auth.accessAccount')}</CardTitle>
             <CardDescription>
-              Sign in to access the internal knowledge base
+              {t('auth.signInDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {currentView === "updatePassword" ? (
               <div>
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold">Set New Password</h3>
-                  <p className="text-sm text-muted-foreground">Enter your new password below</p>
+                  <h3 className="text-lg font-semibold">{t('auth.setNewPassword')}</h3>
+                  <p className="text-sm text-muted-foreground">{t('auth.setNewPasswordDescription')}</p>
                 </div>
                 
                 <form onSubmit={handleUpdatePassword} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="new-password">New Password</Label>
+                    <Label htmlFor="new-password">{t('auth.newPassword')}</Label>
                     <Input
                       id="new-password"
                       name="password"
@@ -248,7 +254,7 @@ export const Auth = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-new-password">Confirm New Password</Label>
+                    <Label htmlFor="confirm-new-password">{t('auth.confirmNewPassword')}</Label>
                     <Input
                       id="confirm-new-password"
                       name="confirmPassword"
@@ -266,16 +272,16 @@ export const Auth = () => {
                   )}
 
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Updating..." : "Update Password"}
+                    {loading ? t('auth.updating') : t('auth.updatePassword')}
                   </Button>
                 </form>
               </div>
             ) : currentView === "forgotPassword" ? (
               <div>
                 <div className="mb-4">
-                  <h3 className="text-lg font-semibold">Reset Password</h3>
+                  <h3 className="text-lg font-semibold">{t('auth.resetPassword')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Enter your email address and we'll send you a link to reset your password
+                    {t('auth.resetPasswordDescription')}
                   </p>
                 </div>
 
@@ -283,7 +289,7 @@ export const Auth = () => {
                   <div className="text-center space-y-4">
                     <Alert>
                       <AlertDescription>
-                        Password reset email sent! Check your inbox and follow the instructions to reset your password.
+                        {t('auth.resetEmailSent')}
                       </AlertDescription>
                     </Alert>
                     <Button 
@@ -291,13 +297,13 @@ export const Auth = () => {
                       onClick={() => {setCurrentView("signin"); setResetEmailSent(false);}}
                       className="w-full"
                     >
-                      Back to Sign In
+                      {t('auth.backToSignIn')}
                     </Button>
                   </div>
                 ) : (
                   <form onSubmit={handleForgotPassword} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="reset-email">Email</Label>
+                      <Label htmlFor="reset-email">{t('auth.email')}</Label>
                       <Input
                         id="reset-email"
                         name="email"
@@ -315,7 +321,7 @@ export const Auth = () => {
                     )}
 
                     <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? "Sending..." : "Send Reset Email"}
+                      {loading ? t('auth.sending') : t('auth.sendResetEmail')}
                     </Button>
                     
                     <Button 
@@ -324,7 +330,7 @@ export const Auth = () => {
                       onClick={() => setCurrentView("signin")}
                       className="w-full"
                     >
-                      Back to Sign In
+                      {t('auth.backToSignIn')}
                     </Button>
                   </form>
                 )}
@@ -332,14 +338,14 @@ export const Auth = () => {
             ) : (
             <Tabs value={currentView} onValueChange={setCurrentView} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                <TabsTrigger value="signin">{t('auth.signIn')}</TabsTrigger>
+                <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="signin">
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signin-email">Email</Label>
+                    <Label htmlFor="signin-email">{t('auth.email')}</Label>
                     <Input
                       id="signin-email"
                       name="email"
@@ -351,7 +357,7 @@ export const Auth = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password">Password</Label>
+                    <Label htmlFor="signin-password">{t('auth.password')}</Label>
                     <Input
                       id="signin-password"
                       name="password"
@@ -368,7 +374,7 @@ export const Auth = () => {
                   )}
 
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Signing in..." : "Sign In"}
+                    {loading ? t('auth.signingIn') : t('auth.signIn')}
                   </Button>
                   
                   <div className="text-center">
@@ -378,7 +384,7 @@ export const Auth = () => {
                       onClick={() => setCurrentView("forgotPassword")}
                       className="text-sm text-muted-foreground hover:text-primary"
                     >
-                      Forgot your password?
+                      {t('auth.forgotPassword')}
                     </Button>
                   </div>
                 </form>
@@ -387,7 +393,7 @@ export const Auth = () => {
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
+                    <Label htmlFor="signup-email">{t('auth.email')}</Label>
                     <Input
                       id="signup-email"
                       name="email"
@@ -399,7 +405,7 @@ export const Auth = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
+                    <Label htmlFor="signup-password">{t('auth.password')}</Label>
                     <Input
                       id="signup-password"
                       name="password"
@@ -410,7 +416,7 @@ export const Auth = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Label htmlFor="confirm-password">{t('auth.confirmPassword')}</Label>
                     <Input
                       id="confirm-password"
                       name="confirmPassword"
@@ -427,7 +433,7 @@ export const Auth = () => {
                   )}
 
                   <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Creating account..." : "Create Account"}
+                    {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
                   </Button>
                 </form>
               </TabsContent>

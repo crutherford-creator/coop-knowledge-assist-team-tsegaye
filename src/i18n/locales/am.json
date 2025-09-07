@@ -4,7 +4,60 @@
     "subtitle": "የውስጥ የድጋፍ ሰራተኞች መሳሪያ"
   },
   "auth": {
-    "signIn": "ግባ"
+    "signIn": "ግባ",
+    "signUp": "መመዝገብ",
+    "backToLanding": "ወደ መነሻ ገጽ",
+    "accessAccount": "መለያዎን ይድረሱ",
+    "signInDescription": "የውስጥ የእውቀት ቋት ለመድረስ ይግቡ",
+    "email": "ኢሜል",
+    "password": "የይለፍ ቃል",
+    "confirmPassword": "የይለፍ ቃል ያረጋግጡ",
+    "forgotPassword": "የይለፍ ቃልዎን ረሱት?",
+    "createAccount": "መለያ ይፍጠሩ",
+    "signingIn": "እየገባ...",
+    "creatingAccount": "መለያ እየፈጠረ...",
+    "resetPassword": "የይለፍ ቃል ዳግም አስጀምር",
+    "resetPasswordDescription": "የኢሜል አድራሻዎን ያስገቡ እና የይለፍ ቃልዎን ለማድስ ሊንክ እንልክልዎታለን",
+    "sendResetEmail": "የዳግም ማስጀመሪያ ኢሜል ላክ",
+    "sending": "በመላክ ላይ...",
+    "backToSignIn": "ወደ መግቢያ ተመለስ",
+    "setNewPassword": "አዲስ የይለፍ ቃል ያስቀምጡ",
+    "setNewPasswordDescription": "በታች አዲስ የይለፍ ቃልዎን ያስገቡ",
+    "newPassword": "አዲስ የይለፍ ቃል",
+    "confirmNewPassword": "አዲስ የይለፍ ቃል ያረጋግጡ",
+    "updatePassword": "የይለፍ ቃል ማዘመን",
+    "updating": "በማዘመን ላይ...",
+    "passwordsDoNotMatch": "የይለፍ ቃሎች አይገናኙም",
+    "resetEmailSent": "የይለፍ ቃል ዳግም ማስጀመሪያ ኢሜል ተልኳል! የይለፍ ቃልዎን እንዴት እንደሚያድሱ መመሪያዎችን ለማግኘት ኢንቦክስዎን ይመልከቱ።"
+  },
+  "chat": {
+    "welcome": "እንኳን ደህና መጡ",
+    "internalUse": "ለውስጥ አጠቃቀም",
+    "signOut": "ውጣ",
+    "newChat": "አዲስ ውይይት",
+    "suggestedQuestions": "የሚጠቁሙ ጥያቄዎች",
+    "typeMessage": "መልዕክትዎን ይጻፉ...",
+    "send": "ላክ",
+    "askQuestion": "ለመጀመር ጥያቄ ይጠይቁ",
+    "thinking": "እያሰበ...",
+    "noChats": "ገና የውይይት ታሪክ የለም",
+    "startConversation": "የውይይት ቁልፎችዎን እዚህ ለማየት ውይይት ይጀምሩ።",
+    "messagesCount": "{{count}} መልዕክቶች",
+    "lastUpdated": "በመጨረሻ የተዘመነው {{time}}",
+    "features": {
+      "instantAccess": {
+        "title": "ቅጽበታዊ መዳረሻ",
+        "description": "ከእውቀት ቋታችን ቅጽበታዊ መልሶች ያግኙ"
+      },
+      "reliableInfo": {
+        "title": "የታመነ መረጃ",
+        "description": "ሁሉም ምላሾች ከተረጋገጡ ሰነዶች የተወሰዱ ናቸው"
+      },
+      "efficientSupport": {
+        "title": "ቀልጣፋ ድጋፍ",
+        "description": "ደንበኞችን በትክክለኛ መረጃ በፍጥነት ይርዱ"
+      }
+    }
   },
   "landing": {
     "internalUse": "ለውስጥ አጠቃቀም ብቻ",
