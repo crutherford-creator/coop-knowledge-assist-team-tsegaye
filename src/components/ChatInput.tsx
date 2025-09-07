@@ -2,20 +2,24 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Send, Loader2 } from "lucide-react";
-import { VoiceInterface } from "./VoiceInterface";
+import { Send, Loader2, Mic, MicOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading?: boolean;
   value?: string;
   onChange?: (value: string) => void;
-  lastResponse?: string;
 }
 
-export const ChatInput = ({ onSendMessage, isLoading, value, onChange, lastResponse }: ChatInputProps) => {
+export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInputProps) => {
   const [message, setMessage] = useState(value || "");
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const [isListening, setIsListening] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,76 +41,129 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange, lastRespo
     }
   };
 
-  const handleVoiceTranscription = (text: string) => {
-    const cleanText = text.trim();
-    setMessage(cleanText);
-    if (onChange) {
-      onChange(cleanText);
+  const startListening = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
+      
+      const audioChunks: Blob[] = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunks.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        await processAudio(audioBlob);
+        
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsListening(true);
+    } catch (error) {
+      console.error('Error starting audio recording:', error);
+      toast({
+        title: "Microphone Error",
+        description: "Could not access microphone. Please check permissions.",
+        variant: "destructive",
+      });
     }
-    console.log('Voice transcription received:', cleanText);
   };
 
-  const handlePlayAudio = async (text: string) => {
-    console.log('handlePlayAudio called with text:', text);
-    if (!text || !text.trim()) {
-      console.log('No text to play');
-      return;
-    }
+  const stopListening = () => {
+    setIsListening(false);
+  };
+
+  const processAudio = async (audioBlob: Blob) => {
+    setIsProcessing(true);
     
     try {
-      console.log('Calling text-to-speech function...');
-      const { data, error } = await supabase.functions.invoke('text-to-speech', {
-        body: { 
-          text: text.trim(), 
-          voice: 'alloy' 
+      // Convert blob to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Audio = reader.result as string;
+        const base64Data = base64Audio.split(',')[1]; // Remove data:audio/webm;base64, prefix
+
+        // Send to speech-to-text API
+        const { data, error } = await supabase.functions.invoke('speech-to-text', {
+          body: { audio: base64Data }
+        });
+
+        if (error) {
+          throw error;
         }
-      });
 
-      console.log('TTS response:', { data, error });
-      if (error) throw error;
-
-      if (data?.audioContent) {
-        const audio = new Audio();
-        const audioBlob = new Blob(
-          [Uint8Array.from(atob(data.audioContent), c => c.charCodeAt(0))],
-          { type: 'audio/mpeg' }
-        );
-        const audioUrl = URL.createObjectURL(audioBlob);
-        audio.src = audioUrl;
-        audio.play();
-        audio.onended = () => URL.revokeObjectURL(audioUrl);
-      }
+        if (data.text && data.text.trim()) {
+          const cleanText = data.text.trim();
+          console.log('Transcribed text:', cleanText);
+          setMessage(cleanText);
+          if (onChange) {
+            onChange(cleanText);
+          }
+        } else {
+          toast({
+            title: "No Speech Detected",
+            description: "Could not detect any speech in the recording.",
+            variant: "destructive",
+          });
+        }
+      };
+      
+      reader.readAsDataURL(audioBlob);
     } catch (error) {
-      console.error('Error playing audio:', error);
+      console.error('Error processing audio:', error);
+      toast({
+        title: "Processing Error",
+        description: "Failed to process audio. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      <VoiceInterface 
-        onTranscription={handleVoiceTranscription}
-        onPlayAudio={() => handlePlayAudio(lastResponse || "")}
-      />
-      
-      <Card className="p-4 bg-card border-border shadow-lg">
-        <form onSubmit={handleSubmit} className="flex gap-3">
-          <Textarea
-            value={value !== undefined ? value : message}
-            onChange={(e) => {
-              setMessage(e.target.value);
-              if (onChange) {
-                onChange(e.target.value);
-              }
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask a question about our policies or procedures..."
-            className="min-h-[80px] resize-none bg-input border-border focus:ring-primary focus:border-primary transition-colors"
-            disabled={isLoading}
-          />
+    <Card className="p-4 bg-card border-border shadow-lg">
+      <form onSubmit={handleSubmit} className="flex gap-3">
+        <Textarea
+          value={value !== undefined ? value : message}
+          onChange={(e) => {
+            setMessage(e.target.value);
+            if (onChange) {
+              onChange(e.target.value);
+            }
+          }}
+          onKeyDown={handleKeyDown}
+          placeholder={t('chat.typeMessage')}
+          className="min-h-[80px] resize-none bg-input border-border focus:ring-primary focus:border-primary transition-colors"
+          disabled={isLoading || isListening || isProcessing}
+        />
+        <div className="flex flex-col gap-2">
+          <Button
+            type="button"
+            onClick={isListening ? stopListening : startListening}
+            disabled={isLoading || isProcessing}
+            variant={isListening ? "destructive" : "outline"}
+            className="px-4 transition-all duration-200"
+          >
+            {isProcessing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : isListening ? (
+              <MicOff className="h-4 w-4" />
+            ) : (
+              <Mic className="h-4 w-4" />
+            )}
+          </Button>
           <Button
             type="submit"
-            disabled={!(value !== undefined ? value.trim() : message.trim()) || isLoading}
-            className="bg-primary hover:bg-primary-dark text-primary-foreground px-6 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+            disabled={!(value !== undefined ? value.trim() : message.trim()) || isLoading || isListening || isProcessing}
+            className="bg-primary hover:bg-primary-dark text-primary-foreground px-4 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -114,12 +171,12 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange, lastRespo
               <Send className="h-4 w-4" />
             )}
           </Button>
-        </form>
-        
-        <div className="mt-2 text-xs text-muted-foreground">
-          Press Enter to send • Shift + Enter for new line
         </div>
-      </Card>
-    </div>
+      </form>
+      
+      <div className="mt-2 text-xs text-muted-foreground">
+        {isListening ? "🎤 Listening... Click stop when done" : "Press Enter to send • Shift + Enter for new line"}
+      </div>
+    </Card>
   );
 };

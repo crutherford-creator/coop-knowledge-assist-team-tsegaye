@@ -333,7 +333,6 @@ export const Chat = () => {
                 isLoading={isLoading}
                 value={inputValue}
                 onChange={setInputValue}
-                lastResponse={lastResponse}
               />
             </div>
           </div>
