@@ -130,7 +130,7 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
 
   return (
     <Card className="p-4 bg-card border-border shadow-lg">
-      <form onSubmit={handleSubmit} className="flex gap-3">
+      <form onSubmit={handleSubmit} className="flex gap-3 items-end">
         <Textarea
           value={value !== undefined ? value : message}
           onChange={(e) => {
@@ -141,16 +141,17 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
           }}
           onKeyDown={handleKeyDown}
           placeholder={t('chat.typeMessage')}
-          className="min-h-[80px] resize-none bg-input border-border focus:ring-primary focus:border-primary transition-colors"
+          className="min-h-[80px] resize-none bg-input border-border focus:ring-primary focus:border-primary transition-colors flex-1"
           disabled={isLoading || isListening || isProcessing}
         />
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-1">
           <Button
             type="button"
             onClick={isListening ? stopListening : startListening}
             disabled={isLoading || isProcessing}
             variant={isListening ? "destructive" : "outline"}
-            className="px-4 transition-all duration-200"
+            size="default"
+            className="h-10 w-10 p-0 transition-all duration-200"
           >
             {isProcessing ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -163,7 +164,8 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
           <Button
             type="submit"
             disabled={!(value !== undefined ? value.trim() : message.trim()) || isLoading || isListening || isProcessing}
-            className="bg-primary hover:bg-primary-dark text-primary-foreground px-4 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
+            size="default"
+            className="h-10 w-10 p-0 bg-primary hover:bg-primary-dark text-primary-foreground transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
