@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { User, Bot, FileText } from "lucide-react";
+import { StreamingText } from "./StreamingText";
 
 interface Source {
   title: string;
@@ -13,9 +14,11 @@ interface ChatMessageProps {
   content: string;
   sources?: Source[];
   timestamp?: string;
+  isStreaming?: boolean;
+  onStreamComplete?: () => void;
 }
 
-export const ChatMessage = ({ type, content, sources, timestamp }: ChatMessageProps) => {
+export const ChatMessage = ({ type, content, sources, timestamp, isStreaming = false, onStreamComplete }: ChatMessageProps) => {
   const isUser = type === "user";
 
   return (
@@ -34,9 +37,18 @@ export const ChatMessage = ({ type, content, sources, timestamp }: ChatMessagePr
             ? "bg-chat-user-bg text-chat-user-text border-primary/20" 
             : "bg-chat-assistant-bg text-chat-assistant-text border-border"
         } shadow-sm transition-all duration-200 hover:shadow-md`}>
-          <div className="whitespace-pre-wrap text-sm leading-relaxed">
-            {content}
-          </div>
+          {type === "assistant" && isStreaming ? (
+            <StreamingText 
+              text={content} 
+              speed={20}
+              isStreaming={isStreaming}
+              onComplete={onStreamComplete}
+            />
+          ) : (
+            <div className="whitespace-pre-wrap text-sm leading-relaxed">
+              {content}
+            </div>
+          )}
         </Card>
         
         {timestamp && (

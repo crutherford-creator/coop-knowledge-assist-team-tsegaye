@@ -16,6 +16,7 @@ interface Message {
   content: string;
   sources?: { title: string; section?: string }[];
   timestamp: string;
+  isStreaming?: boolean;
 }
 
 interface ChatThread {
@@ -175,40 +176,25 @@ export const Chat = () => {
           content: "I apologize, but I'm experiencing technical difficulties accessing our knowledge base. Please try again in a moment, or contact your supervisor if the issue persists.",
           sources: [],
           timestamp: new Date().toLocaleTimeString(),
+          isStreaming: false,
         };
         setMessages(prev => [...prev, assistantMessage]);
         setIsLoading(false);
         return;
       }
 
+      // Create streaming assistant message
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: "assistant",
         content: ragResponse.answer,
         sources: ragResponse.sources || [],
         timestamp: new Date().toLocaleTimeString(),
+        isStreaming: true,
       };
-
-      // Save assistant response to database
-      await supabase
-        .from('messages')
-        .insert({
-          thread_id: currentThread.id,
-          content: assistantMessage.content,
-          sender: 'agent',
-          metadata: ragResponse.sources ? { sources: ragResponse.sources } : null
-        });
 
       setMessages(prev => [...prev, assistantMessage]);
       setLastResponse(assistantMessage.content);
-      
-      // Update thread updated_at timestamp and trigger sidebar refresh
-      await supabase
-        .from('chat_threads')
-        .update({ updated_at: new Date().toISOString() })
-        .eq('id', currentThread.id);
-        
-      setShouldRefreshThreads(prev => prev + 1);
       setIsLoading(false);
 
     } catch (error) {
@@ -236,6 +222,37 @@ export const Chat = () => {
       
       setIsLoading(false);
     }
+  };
+
+  const handleStreamComplete = async (messageId: string, content: string, sources: any[]) => {
+    // Save to database after streaming completes
+    if (currentThread) {
+      await supabase
+        .from('messages')
+        .insert({
+          thread_id: currentThread.id,
+          content: content,
+          sender: 'agent',
+          metadata: sources ? { sources: sources } : null
+        });
+
+      // Update thread timestamp and refresh sidebar
+      await supabase
+        .from('chat_threads')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', currentThread.id);
+        
+      setShouldRefreshThreads(prev => prev + 1);
+    }
+
+    // Update message to stop streaming
+    setMessages(prev => 
+      prev.map(msg => 
+        msg.id === messageId 
+          ? { ...msg, isStreaming: false }
+          : msg
+      )
+    );
   };
 
   const handleThreadSelect = async (threadId: string) => {
@@ -314,6 +331,8 @@ export const Chat = () => {
                       content={message.content}
                       sources={message.sources}
                       timestamp={message.timestamp}
+                      isStreaming={message.isStreaming}
+                      onStreamComplete={() => handleStreamComplete(message.id, message.content, message.sources || [])}
                     />
                   ))
                 )}
