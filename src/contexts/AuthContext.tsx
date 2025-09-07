@@ -53,10 +53,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    // Temporarily disable email confirmation due to URL configuration issue
+    const redirectUrl = `https://cd08b581-b5d0-437e-9c7b-219593bff6c2.sandbox.lovable.dev/`;
+    
     const { error } = await supabase.auth.signUp({
       email,
-      password
+      password,
+      options: {
+        emailRedirectTo: redirectUrl
+      }
     });
     return { error };
   };
@@ -74,7 +78,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const resetPassword = async (email: string) => {
-    const redirectUrl = `${window.location.origin}/auth`;
+    const redirectUrl = `https://cd08b581-b5d0-437e-9c7b-219593bff6c2.sandbox.lovable.dev/auth`;
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl
