@@ -144,7 +144,7 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
           className="min-h-[80px] resize-none bg-input border-border focus:ring-primary focus:border-primary transition-colors"
           disabled={isLoading || isListening || isProcessing}
         />
-        <div className="flex flex-col gap-2">
+        <div className="flex gap-2">
           <Button
             type="button"
             onClick={isListening ? stopListening : startListening}
