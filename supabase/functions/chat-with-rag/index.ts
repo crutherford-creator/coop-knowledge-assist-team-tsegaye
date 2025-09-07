@@ -30,25 +30,19 @@ serve(async (req) => {
 
     console.log('Processing question:', question.substring(0, 100) + '...');
 
-    // Query Flowise RAG system with timeout and optimizations
+    // Query Flowise RAG system
     ragStartTime = Date.now();
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
     
     const flowiseResponse = await fetch(
       "https://cloud.flowiseai.com/api/v1/prediction/85fa5000-8173-4a5c-afc7-c84bf033fd27",
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Connection": "keep-alive" // Reuse connections
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({ question }),
-        signal: controller.signal
+        body: JSON.stringify({ question })
       }
     );
-    
-    clearTimeout(timeoutId);
     const ragTime = Date.now() - ragStartTime;
     console.log('Flowise response received in:', ragTime + 'ms');
 
