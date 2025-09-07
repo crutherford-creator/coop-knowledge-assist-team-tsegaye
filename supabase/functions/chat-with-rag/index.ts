@@ -13,8 +13,13 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const startTime = Date.now();
+  let ragStartTime: number;
+  let dbStartTime: number;
+
   try {
     const { question, threadId } = await req.json();
+    console.log('RAG request started for thread:', threadId);
 
     if (!question || !threadId) {
       return new Response(
@@ -23,20 +28,29 @@ serve(async (req) => {
       );
     }
 
-    console.log('Processing question:', question);
-    console.log('Thread ID:', threadId);
+    console.log('Processing question:', question.substring(0, 100) + '...');
 
-    // Query Flowise RAG system
+    // Query Flowise RAG system with timeout and optimizations
+    ragStartTime = Date.now();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    
     const flowiseResponse = await fetch(
       "https://cloud.flowiseai.com/api/v1/prediction/85fa5000-8173-4a5c-afc7-c84bf033fd27",
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Connection": "keep-alive" // Reuse connections
         },
-        body: JSON.stringify({ question })
+        body: JSON.stringify({ question }),
+        signal: controller.signal
       }
     );
+    
+    clearTimeout(timeoutId);
+    const ragTime = Date.now() - ragStartTime;
+    console.log('Flowise response received in:', ragTime + 'ms');
 
     if (!flowiseResponse.ok) {
       console.error('Flowise API error:', flowiseResponse.status, flowiseResponse.statusText);
@@ -44,69 +58,83 @@ serve(async (req) => {
     }
 
     const ragResult = await flowiseResponse.json();
-    console.log('RAG response received:', ragResult);
+    console.log('RAG response parsed, content length:', ragResult.text?.length || 0);
 
     // Extract the answer and sources from Flowise response
     const answer = ragResult.text || ragResult.answer || ragResult.message || 'I apologize, but I could not find a relevant answer in our knowledge base.';
     
-    // Extract sources if available (adjust based on your Flowise response structure)
-    const sources = ragResult.sourceDocuments?.map((doc: any) => {
-      // Try to get a meaningful document title
-      const title = doc.metadata?.title || 
-                   (doc.metadata?.pdf?.info?.Title) || 
-                   'CoopBank Policy Document';
-      
-      // Get page number from either location or direct metadata
-      const pageNumber = doc.metadata?.loc?.pageNumber || doc.metadata?.page;
-      const section = doc.metadata?.section || (pageNumber ? `Page ${pageNumber}` : undefined);
-      
-      return {
-        title,
-        section
-      };
-    }) || [];
+    // Extract sources if available (optimized processing)
+    const sources = ragResult.sourceDocuments?.slice(0, 5).map((doc: any) => ({
+      title: doc.metadata?.title || 
+             (doc.metadata?.pdf?.info?.Title) || 
+             'CoopBank Policy Document',
+      section: doc.metadata?.section || 
+               (doc.metadata?.loc?.pageNumber ? `Page ${doc.metadata.loc.pageNumber}` : 
+                doc.metadata?.page ? `Page ${doc.metadata.page}` : undefined)
+    })) || [];
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Save the assistant response to the database
-    const { error: insertError } = await supabase
-      .from('messages')
-      .insert([
-        {
+    // Database operations in parallel for better performance
+    dbStartTime = Date.now();
+    const [insertResult, updateResult] = await Promise.allSettled([
+      // Save the assistant response
+      supabase
+        .from('messages')
+        .insert([{
           thread_id: threadId,
           sender: 'agent',
           content: answer,
           metadata: {
             sources: sources,
             timestamp: new Date().toISOString(),
-            model: 'flowise-rag'
+            model: 'flowise-rag',
+            processingTime: ragTime
           }
-        }
-      ]);
+        }]),
+      
+      // Update thread timestamp
+      supabase
+        .from('chat_threads')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', threadId)
+    ]);
 
-    if (insertError) {
-      console.error('Error saving message:', insertError);
+    const dbTime = Date.now() - dbStartTime;
+    const totalTime = Date.now() - startTime;
+
+    // Handle database results
+    if (insertResult.status === 'rejected') {
+      console.error('Error saving message:', insertResult.reason);
       throw new Error('Failed to save response');
     }
 
-    // Update thread timestamp
-    const { error: updateError } = await supabase
-      .from('chat_threads')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', threadId);
-
-    if (updateError) {
-      console.error('Error updating thread:', updateError);
+    if (updateResult.status === 'rejected') {
+      console.error('Error updating thread:', updateResult.reason);
+      // Don't throw here as it's not critical
     }
+
+    console.log('RAG request completed:', {
+      ragTime: ragTime + 'ms',
+      dbTime: dbTime + 'ms', 
+      totalTime: totalTime + 'ms',
+      answerLength: answer.length,
+      sourcesCount: sources.length
+    });
 
     return new Response(
       JSON.stringify({ 
         answer,
         sources,
-        success: true
+        success: true,
+        metadata: {
+          processingTime: totalTime,
+          ragTime,
+          dbTime
+        }
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -114,11 +142,20 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error in chat-with-rag function:', error);
+    const totalTime = Date.now() - startTime;
+    console.error('Error in chat-with-rag function:', {
+      error: error.message,
+      totalTime: totalTime + 'ms'
+    });
+    
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        answer: 'I apologize, but I encountered an error while processing your question. Please try again or contact support if the issue persists.'
+        answer: 'I apologize, but I encountered an error while processing your question. Please try again or contact support if the issue persists.',
+        metadata: {
+          processingTime: totalTime,
+          failed: true
+        }
       }),
       {
         status: 500,
