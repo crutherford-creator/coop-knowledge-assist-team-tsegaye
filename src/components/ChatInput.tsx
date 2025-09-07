@@ -45,9 +45,19 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
 
   const startListening = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          sampleRate: 16000, // Optimize for Whisper
+          channelCount: 1,   // Mono audio
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        } 
+      });
+      
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
+        mimeType: 'audio/webm;codecs=opus',
+        audioBitsPerSecond: 16000 // Lower bitrate for faster processing
       });
       
       mediaRecorderRef.current = mediaRecorder;
@@ -61,16 +71,18 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
 
       mediaRecorder.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        console.log('Audio blob created, size:', audioBlob.size, 'bytes');
         await processAudio(audioBlob);
         
         // Stop all tracks
         stream.getTracks().forEach(track => track.stop());
       };
 
-      mediaRecorder.start();
+      // Start recording with shorter intervals for faster processing
+      mediaRecorder.start(1000); // Collect data every second
       setIsListening(true);
       
-      console.log('Started recording audio');
+      console.log('Started recording audio with optimized settings');
     } catch (error) {
       console.error('Error starting audio recording:', error);
       toast({
@@ -91,55 +103,70 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
 
   const processAudio = async (audioBlob: Blob) => {
     setIsProcessing(true);
+    const startTime = Date.now();
     console.log('Processing audio blob:', audioBlob.size, 'bytes');
     
     try {
-      // Convert blob to base64
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64Audio = reader.result as string;
-        const base64Data = base64Audio.split(',')[1]; // Remove data:audio/webm;base64, prefix
-        
-        console.log('Sending audio to speech-to-text, size:', base64Data.length);
-
-        // Send to speech-to-text API
-        const { data, error } = await supabase.functions.invoke('speech-to-text', {
-          body: { audio: base64Data }
-        });
-
-        console.log('Speech-to-text response:', { data, error });
-
-        if (error) {
-          throw error;
-        }
-
-        if (data?.text && data.text.trim()) {
-          const cleanText = data.text.trim();
-          console.log('Transcribed text:', cleanText);
-          setMessage(cleanText);
-          if (onChange) {
-            onChange(cleanText);
-          }
-          toast({
-            title: "Speech Transcribed",
-            description: "Voice successfully converted to text.",
-          });
-        } else {
-          console.log('No text in response:', data);
-          toast({
-            title: "No Speech Detected",
-            description: "Could not detect any speech in the recording.",
-            variant: "destructive",
-          });
-        }
-      };
+      // Convert blob to base64 more efficiently
+      const arrayBuffer = await audioBlob.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
       
-      reader.readAsDataURL(audioBlob);
+      // Convert to base64 in a more efficient way
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < uint8Array.length; i += chunkSize) {
+        const chunk = uint8Array.slice(i, i + chunkSize);
+        binary += String.fromCharCode.apply(null, Array.from(chunk));
+      }
+      const base64Data = btoa(binary);
+      
+      console.log('Audio converted to base64, sending to speech-to-text...');
+      const apiStartTime = Date.now();
+
+      // Send to speech-to-text API
+      const { data, error } = await supabase.functions.invoke('speech-to-text', {
+        body: { audio: base64Data }
+      });
+
+      const apiTime = Date.now() - apiStartTime;
+      const totalTime = Date.now() - startTime;
+      
+      console.log('Speech-to-text response:', { 
+        data, 
+        error, 
+        apiTime: `${apiTime}ms`,
+        totalTime: `${totalTime}ms`
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.text && data.text.trim()) {
+        const cleanText = data.text.trim();
+        console.log('Transcribed text:', cleanText);
+        setMessage(cleanText);
+        if (onChange) {
+          onChange(cleanText);
+        }
+        toast({
+          title: "Speech Transcribed",
+          description: `Voice converted to text in ${totalTime}ms`,
+        });
+      } else {
+        console.log('No text in response:', data);
+        toast({
+          title: "No Speech Detected",
+          description: "Could not detect any speech in the recording.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
-      console.error('Error processing audio:', error);
+      const totalTime = Date.now() - startTime;
+      console.error('Error processing audio:', error, `(${totalTime}ms)`);
       toast({
         title: "Processing Error",
-        description: "Failed to process audio. Please try again.",
+        description: `Failed to process audio after ${totalTime}ms. Please try again.`,
         variant: "destructive",
       });
     } finally {
