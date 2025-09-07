@@ -53,14 +53,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
+    // Temporarily disable email confirmation due to URL configuration issue
     const { error } = await supabase.auth.signUp({
       email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl
-      }
+      password
     });
     return { error };
   };
