@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -20,6 +20,8 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
   const { t } = useTranslation();
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,16 +50,17 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
         mimeType: 'audio/webm;codecs=opus'
       });
       
-      const audioChunks: Blob[] = [];
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          audioChunks.push(event.data);
+          audioChunksRef.current.push(event.data);
         }
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         await processAudio(audioBlob);
         
         // Stop all tracks
@@ -66,6 +69,8 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
 
       mediaRecorder.start();
       setIsListening(true);
+      
+      console.log('Started recording audio');
     } catch (error) {
       console.error('Error starting audio recording:', error);
       toast({
@@ -77,11 +82,16 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
   };
 
   const stopListening = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      console.log('Stopping audio recording');
+      mediaRecorderRef.current.stop();
+    }
     setIsListening(false);
   };
 
   const processAudio = async (audioBlob: Blob) => {
     setIsProcessing(true);
+    console.log('Processing audio blob:', audioBlob.size, 'bytes');
     
     try {
       // Convert blob to base64
@@ -89,24 +99,33 @@ export const ChatInput = ({ onSendMessage, isLoading, value, onChange }: ChatInp
       reader.onloadend = async () => {
         const base64Audio = reader.result as string;
         const base64Data = base64Audio.split(',')[1]; // Remove data:audio/webm;base64, prefix
+        
+        console.log('Sending audio to speech-to-text, size:', base64Data.length);
 
         // Send to speech-to-text API
         const { data, error } = await supabase.functions.invoke('speech-to-text', {
           body: { audio: base64Data }
         });
 
+        console.log('Speech-to-text response:', { data, error });
+
         if (error) {
           throw error;
         }
 
-        if (data.text && data.text.trim()) {
+        if (data?.text && data.text.trim()) {
           const cleanText = data.text.trim();
           console.log('Transcribed text:', cleanText);
           setMessage(cleanText);
           if (onChange) {
             onChange(cleanText);
           }
+          toast({
+            title: "Speech Transcribed",
+            description: "Voice successfully converted to text.",
+          });
         } else {
+          console.log('No text in response:', data);
           toast({
             title: "No Speech Detected",
             description: "Could not detect any speech in the recording.",
